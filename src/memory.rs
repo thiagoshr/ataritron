@@ -91,5 +91,26 @@ mod tests {
     fn memory_new_errors_on_size_too_small() {
         assert!(Memory::new(13823).is_err());
     }
+
+    #[test]
+    fn memory_loads_a_byte() {
+        let mut mem = Memory::new(16 * 1024).unwrap();
+        let addr : u16 = 0x1200; // I picked the address
+        let my_byte = 0x88; // why not 0x88? mem inits to 0x00 and that is tested
+
+        // cannot rely on store function for unit test
+        mem.data[addr as usize] = my_byte; 
+        assert_eq!(my_byte, mem.load(addr).unwrap());
+    }
+
+    #[test]
+    fn memory_stores_a_byte() {
+        let mut mem = Memory::new(16 * 1024).unwrap();
+        let addr = 0x3000;
+        let my_value = 50;
+
+        mem.store(addr, my_value).unwrap();
+        assert_eq!(my_value, mem.data[addr as usize]);
+    }
 }
 
