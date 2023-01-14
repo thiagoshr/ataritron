@@ -145,4 +145,59 @@ mod tests {
         assert_eq!(cpu.sr, 0x0);
         assert_eq!(cpu.memory.load(0x0000).unwrap(), 0);
     }
+
+    #[test]
+    fn can_fetch_brk_ora_instructions() {
+        let mut mem = Memory::new(16*1024).unwrap();
+        mem.load_rom(0x1000, vec![
+            0x00,
+            0x09, 0x0a,
+            0x05, 0x01,
+            0x15, 0x01,
+            0x0d, 0x01, 0x02,
+            0x1d, 0x01, 0x02,
+            0x19, 0x04, 0xa2,
+            0x01, 0x03,
+            0x11, 0x03
+        ]);
+
+        let mut cpu = Cpu::new(mem);
+
+        assert_eq!(Instruction {
+            operation: Operations::SoftwareInterrupt,
+            operands: Addressing::Implied
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::Immediate(0x0a)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::Zeropage(0x01)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::IndexedZeropage(0x01, 0x00)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::Absolute(0x0201)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::IndexedAbsolute(0x0201, 0x00)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::IndexedAbsolute(0xa204, 0x00)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::PreindexedIndirect(0x03, 0x00)
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::InclusiveOrWithAccumulator,
+            operands: Addressing::PostindexedIndirect(0x03, 0x00)
+        }, cpu.fetch());
+    }
 }

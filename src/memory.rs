@@ -65,6 +65,13 @@ impl Memory {
         })
     }
     
+    pub fn load_rom(&mut self, addr : u16, rom: Vec<u8>) {
+        let mut addr = addr;
+        for byte in rom.iter() {
+            self.store(addr, *byte).unwrap();
+            addr += 1;
+        }
+    }
 }
 
 #[cfg(test)]
