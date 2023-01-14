@@ -62,7 +62,7 @@ mod memory {
 			Err(OutOfRangeError {
 				value: addr as u32,
 				min: 0x0,
-				max: self.size
+				max: (self.size - 1) as u32
 			})
 		}
 		
