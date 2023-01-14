@@ -1,6 +1,7 @@
 mod instructions;
 
 use crate::memory::{self, Memory};
+use instructions::*;
 
 pub struct Cpu {
     /// program counter
@@ -35,6 +36,95 @@ impl Cpu {
             sr: 0,
             memory: mem
         }
+    }
+
+    fn load_little_endian_u16(&self, addr : u16) -> u16 {
+        let low_bytes = self.memory.load(addr).unwrap();
+        let high_bytes = self.memory.load(addr + 1).unwrap();
+
+        ((high_bytes as u16) << 8) | (low_bytes as u16)
+    }
+
+    /// fetches the next instruction to be run and increments the program counter
+    fn fetch(&mut self) -> Instruction {
+        let opcode = self.memory.load(self.pc).unwrap();
+        let instruction_size : u16;
+
+        let instruction = match opcode {
+            0x00 => {
+                instruction_size = 1;
+                Instruction { // BRK
+                    operation: Operations::SoftwareInterrupt,
+                    operands: Addressing::Implied
+                }
+            },
+            0x09 => {
+                instruction_size = 2;
+                Instruction {  // ORA immediate
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap())
+                }
+            },
+            0x05 => {
+                instruction_size = 2;
+                Instruction { // ORA zeropage
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap())
+                }
+            },
+            0x15 => {
+                instruction_size = 2;
+                Instruction { // ORA indexed zeropage
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x)
+                }
+            },
+            0x0d => {
+                instruction_size = 3;
+                Instruction { // ORA absolute
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1))
+                }
+            },
+            0x1d => {
+                instruction_size = 3;
+                Instruction { // ORA absolute,X
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x)
+                }
+            },
+            0x19 => {
+                instruction_size = 3;
+                Instruction { // ORA absolute,Y
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y)
+                }
+            },
+            0x01 => {
+                instruction_size = 2;
+                Instruction { // ORA (indirect,X)
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x)
+                }
+            },
+            0x11 => {
+                instruction_size = 2;
+                Instruction { /// ORA (indirect), Y
+                    operation: Operations::InclusiveOrWithAccumulator,
+                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y)
+                }
+            },
+            _ => {
+                instruction_size = 1;
+                Instruction {
+                    operation: Operations::NoOperation,
+                    operands: Addressing::Implied
+                }
+            }
+        };
+
+        self.pc += instruction_size;
+        instruction
     }
 }
 
