@@ -28,7 +28,7 @@ pub struct Cpu {
 impl Cpu {
     fn new(mem: Memory) -> Cpu {
         Cpu {
-            sp: 0x01ff, // stack: [0x00ff, 0x03ff] 
+            sp: 0x01ff, // stack: [0x0100, 0x01ff] 
             pc: 0x1000, // cartridge first address
             a: 0,
             x: 0,
