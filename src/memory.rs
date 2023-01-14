@@ -67,5 +67,21 @@ mod memory {
         }
         
     }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn memory_inits_to_zero_array() {
+            let size = 32 * 1024; // a middle-of-the-road test case
+
+            let expected_mem = vec![0x00 as u8; size];
+            assert_eq!(size, expected_mem.len());
+
+            let new_mem = Memory::new(size as u32).unwrap();
+            assert_eq!(expected_mem, new_mem.data);
+        }
+    }
 }
 
