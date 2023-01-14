@@ -81,5 +81,15 @@ mod tests {
         let new_mem = Memory::new(size as u32).unwrap();
         assert_eq!(expected_mem, new_mem.data);
     }
+
+    #[test]
+    fn memory_new_errors_on_size_too_big() {
+        assert!(Memory::new(65537).is_err());
+    }
+
+    #[test]
+    fn memory_new_errors_on_size_too_small() {
+        assert!(Memory::new(13823).is_err());
+    }
 }
 
