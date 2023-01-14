@@ -28,7 +28,7 @@ pub struct Cpu {
 impl Cpu {
     fn new(mem: Memory) -> Cpu {
         Cpu {
-            sp: 0x00ff, // stack: [0x00ff, 0x03ff] 
+            sp: 0x01ff, // stack: [0x00ff, 0x03ff] 
             pc: 0x1000, // cartridge first address
             a: 0,
             x: 0,
@@ -137,7 +137,7 @@ mod tests {
         let mem = Memory::new(16*1024).unwrap();
 
         let cpu = Cpu::new(mem);
-        assert_eq!(cpu.sp, 0x00ff);
+        assert_eq!(cpu.sp, 0x01ff);
         assert_eq!(cpu.pc, 0x1000);
         assert_eq!(cpu.a, 0x0);
         assert_eq!(cpu.x, 0x0);
