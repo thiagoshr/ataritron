@@ -93,6 +93,18 @@ mod tests {
     }
 
     #[test]
+    fn load_errors_on_out_of_bounds() {
+        let mut mem = Memory::new(16 * 1024).unwrap(); // 16kB
+        assert!(mem.load(0x4000).is_err()); // top bound == 0x3999
+    }
+
+    #[test]
+    fn store_errors_on_out_of_bounds() {
+        let mut mem = Memory::new(16 * 1024).unwrap(); // 16kB
+        assert!(mem.store(0x4000, 0x77).is_err())
+    }
+
+    #[test]
     fn memory_loads_a_byte() {
         let mut mem = Memory::new(16 * 1024).unwrap();
         let addr : u16 = 0x1200; // I picked the address
