@@ -36,9 +36,35 @@ mod memory {
 
 			Ok(Memory {
 				data: vec![0x00; size as usize],
-				size: size
+				size
 			})
 		}
+
+		pub fn load(&self, addr : u16) -> Result<u8, OutOfRangeError> {
+			if (addr as u32) < self.size {
+				Ok(self.data[addr as usize])
+			} else {
+				Err(OutOfRangeError {
+					value: addr as u32,
+					min: 0x0,
+					max: (self.size - 1) as u32
+				})
+			}
+		}
+
+		pub fn store(&mut self, addr : u16, byte : u8) -> Result<(), OutOfRangeError> {
+			if (addr as u32) < self.size {
+				self.data[addr as usize] = byte;
+				return Ok(())
+			}
+
+			Err(OutOfRangeError {
+				value: addr as u32,
+				min: 0x0,
+				max: self.size
+			})
+		}
+		
 	}
 }
 
