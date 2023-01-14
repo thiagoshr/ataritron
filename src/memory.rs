@@ -1,6 +1,3 @@
-use core::fmt::Display;
-use std::fmt;
-
 mod memory {
     use core::fmt;
 
@@ -23,6 +20,10 @@ mod memory {
 	}
 	
 	impl Memory {
+		fn address_in_bounds(addr : u16, size : u32) -> bool {
+			(addr as u32) < size
+		}
+
 		pub fn new(size : u32) -> Result<Memory, OutOfRangeError> {
 			// size for the atary 2600 is 13.5 kB.
 			// we have a 16-bit bus so max size is 0xffff+1
@@ -41,7 +42,7 @@ mod memory {
 		}
 
 		pub fn load(&self, addr : u16) -> Result<u8, OutOfRangeError> {
-			if (addr as u32) < self.size {
+			if Memory::address_in_bounds(addr, self.size) {
 				Ok(self.data[addr as usize])
 			} else {
 				Err(OutOfRangeError {
@@ -53,7 +54,7 @@ mod memory {
 		}
 
 		pub fn store(&mut self, addr : u16, byte : u8) -> Result<(), OutOfRangeError> {
-			if (addr as u32) < self.size {
+			if Memory::address_in_bounds(addr, self.size) {
 				self.data[addr as usize] = byte;
 				return Ok(())
 			}
