@@ -1,4 +1,6 @@
-use crate::memory::Memory;
+mod instructions;
+
+use crate::memory;
 
 pub struct Cpu {
 	/// program counter
