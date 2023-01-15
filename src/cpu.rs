@@ -3,7 +3,7 @@ mod instructions;
 #[cfg(test)]
 mod tests;
 
-use crate::memory::{self, Memory};
+use crate::memory::Memory;
 use instructions::*;
 
 pub struct Cpu {
@@ -32,7 +32,7 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    fn new(mem: Memory) -> Cpu {
+    pub fn new(mem: Memory) -> Cpu {
         Cpu {
             sp: 0xff, // stack: [0x0100, 0x01ff] 
             pc: 0x1000, // cartridge first address
