@@ -183,6 +183,14 @@ impl Cpu {
                     cycle_count: 3
                 }
             },
+            0x10 => {
+                instruction_size = 2;
+                Instruction { // BPL relative
+                    operation: Operations::BranchOnPlus,
+                    operands: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
@@ -374,6 +382,28 @@ mod tests {
             operation: Operations::PushStatusRegister,
             operands: Addressing::Implied,
             cycle_count: 3
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::Implied,
+            cycle_count: 2
+        }, cpu.fetch());
+    }
+
+    #[test]
+    fn can_fetch_bpl_instruction () {
+        let rom = vec![
+            0x10, 0x1b,
+            0x0a
+        ];
+        let mut mem = Memory::new(64*1024).unwrap();
+        mem.load_rom(0x1000, &rom);
+        let mut cpu = Cpu::new(mem);
+
+        assert_eq!(Instruction {
+            operation: Operations::BranchOnPlus,
+            operands: Addressing::RelativeAddress(0x1b),
+            cycle_count: 2
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::ArithmeticShiftLeft,
