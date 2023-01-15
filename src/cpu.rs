@@ -211,7 +211,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn cpu_initializes() {
+    fn initializes() {
         let mem = Memory::new(16*1024).unwrap();
 
         let cpu = Cpu::new(mem);
@@ -226,7 +226,7 @@ mod tests {
     }
 
     #[test]
-    fn cpu_loads_little_endian_word () {
+    fn loads_little_endian_word () {
         let mut mem = Memory::new(64*1024).unwrap();
 
         mem.load_rom(0x0000, &vec![0xab, 0xcd]);
@@ -239,7 +239,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn cpu_panics_on_invalid_word_read () {
+    fn panics_on_invalid_word_read () {
         let mem = Memory::new(64*1024).unwrap();
         let cpu = Cpu::new(mem);
         _ = cpu.load_little_endian_u16(0xffff);
@@ -247,7 +247,7 @@ mod tests {
 
 
     #[test]
-    fn cpu_resets_properly() {
+    fn resets_properly() {
         let mut mem = Memory::new(65536).unwrap();
 
         mem.load_rom(0xfffc, &vec![0x02, 0x03]);
