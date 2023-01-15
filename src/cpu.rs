@@ -129,12 +129,52 @@ impl Cpu {
             },
             0x11 => {
                 instruction_size = 2;
-                Instruction { /// ORA (indirect), Y
+                Instruction { // ORA (indirect), Y
                     operation: Operations::InclusiveOrWithAccumulator,
                     operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
                     cycle_count: 5
                 }
             },
+            0x0a => {
+                instruction_size = 1;
+                Instruction { // ASL accumulator (implied)
+                    operation: Operations::ArithmeticShiftLeft,
+                    operands: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x06 => {
+                instruction_size = 2;
+                Instruction { // ASL zeropage 
+                    operation: Operations::ArithmeticShiftLeft,
+                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 5
+                }
+            },
+            0x16 => {
+                instruction_size = 2;
+                Instruction { /// ASL zeropage,X
+                    operation: Operations::ArithmeticShiftLeft,
+                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x0e => {
+                instruction_size = 3;
+                Instruction { // ASL absolute
+                    operation: Operations::ArithmeticShiftLeft,
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 6
+                }
+            },
+            0x1e => {
+                instruction_size = 3;
+                Instruction { // ASL absolute, X
+                    operation: Operations::ArithmeticShiftLeft,
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 7
+                }
+            }
             _ => {
                 instruction_size = 1;
                 Instruction {
@@ -268,6 +308,47 @@ mod tests {
             operation: Operations::InclusiveOrWithAccumulator,
             operands: Addressing::PostindexedIndirect(0x03, 0x00),
             cycle_count: 5
+        }, cpu.fetch());
+    }
+
+    #[test]
+    fn can_fetch_asl_instructions() {
+        let mut mem = Memory::new(16*1024).unwrap();
+        mem.load_rom(0x1000, &vec![
+            0x0a,
+            0x06, 0x0a,
+            0x16, 0x01,
+            0x0e, 0x10, 0x45,
+            0x1e, 0x11, 0x45
+        ]);
+
+        let mut cpu = Cpu::new(mem);
+        cpu.x = 0x0a;
+
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::Implied,
+            cycle_count: 2
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::Zeropage(0x0a),
+            cycle_count: 5
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::IndexedZeropage(0x01, 0x0a),
+            cycle_count: 6
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::Absolute(0x4510),
+            cycle_count: 6
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::IndexedAbsolute(0x4511, 0x0a),
+            cycle_count: 7
         }, cpu.fetch());
     }
 }
