@@ -65,11 +65,9 @@ impl Memory {
         })
     }
     
-    pub fn load_rom(&mut self, addr : u16, rom: Vec<u8>) {
-        let mut addr = addr;
-        for byte in rom.iter() {
-            self.store(addr, *byte).unwrap();
-            addr += 1;
+    pub fn load_rom(&mut self, addr : u16, rom: &Vec<u8>) {
+        for (i, byte) in rom.iter().enumerate() {
+            self.store(addr + (i as u16), *byte).unwrap();
         }
     }
 }
@@ -130,6 +128,22 @@ mod tests {
 
         mem.store(addr, my_value).unwrap();
         assert_eq!(my_value, mem.data[addr as usize]);
+    }
+
+    #[test]
+    fn memory_can_load_whole_memory() {
+        let rom = vec![0xff; 65536];
+        let mut mem = Memory::new(64*1024).unwrap();
+        mem.load_rom(0x0000, &rom);
+        assert_eq!(rom, mem.data);
+    }
+
+    #[test]
+    #[should_panic]
+    fn memory_panics_on_load_rom_out_of_bounds(){
+        let rom = vec![0x00; 16];
+        let mut mem = Memory::new(16*1024).unwrap();
+        mem.load_rom(0xff00, &rom);
     }
 }
 

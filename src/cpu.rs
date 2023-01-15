@@ -41,6 +41,15 @@ impl Cpu {
         }
     }
 
+    fn reset(&mut self) {
+        self.sp = 0xff;
+        self.pc = self.load_little_endian_u16(0xfffc);
+        self.a = 0;
+        self.x = 0;
+        self.sr = 0;
+        self.cycles_busy = 1;
+    }
+
     fn load_little_endian_u16(&self, addr : u16) -> u16 {
         let low_bytes = self.memory.load(addr).unwrap();
         let high_bytes = self.memory.load(addr + 1).unwrap();
@@ -161,9 +170,47 @@ mod tests {
     }
 
     #[test]
+    fn cpu_loads_little_endian_word () {
+        let mut mem = Memory::new(64*1024).unwrap();
+
+        mem.load_rom(0x0000, &vec![0xab, 0xcd]);
+        mem.load_rom(0xfffe, &vec![0xdc, 0xba]);
+
+        let cpu = Cpu::new(mem);
+        assert_eq!(0xcdab, cpu.load_little_endian_u16(0x0000));
+        assert_eq!(0xbadc, cpu.load_little_endian_u16(0xfffe));
+    }
+
+    #[test]
+    #[should_panic]
+    fn cpu_panics_on_invalid_word_read () {
+        let mem = Memory::new(64*1024).unwrap();
+        let cpu = Cpu::new(mem);
+        _ = cpu.load_little_endian_u16(0xffff);
+    }
+
+
+    #[test]
+    fn cpu_resets_properly() {
+        let mut mem = Memory::new(65536).unwrap();
+
+        mem.load_rom(0xfffc, &vec![0x02, 0x03]);
+        let mut cpu = Cpu::new(mem);
+        cpu.reset();
+        assert_eq!(cpu.sp, 0xff);
+        assert_eq!(cpu.pc, 0x0302);
+        assert_eq!(cpu.a, 0x0);
+        assert_eq!(cpu.x, 0x0);
+        assert_eq!(cpu.y, 0x0);
+        assert_eq!(cpu.sr, 0x0);
+        assert_eq!(cpu.load_little_endian_u16(0xfffc), 0x0302);
+        assert_eq!(cpu.cycles_busy, 1);
+    }
+
+    #[test]
     fn can_fetch_brk_ora_instructions() {
         let mut mem = Memory::new(16*1024).unwrap();
-        mem.load_rom(0x1000, vec![
+        mem.load_rom(0x1000, &vec![
             0x00,
             0x09, 0x0a,
             0x05, 0x01,
