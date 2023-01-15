@@ -26,7 +26,7 @@ impl Memory {
     pub fn new(size : u32) -> Result<Memory, OutOfRangeError> {
         // size for the atary 2600 is 13.5 kB.
         // we have a 16-bit bus so max size is 0xffff+1
-        if size < 13824 || size > 0xffff + 1 {
+        if !(13824..=0xffff + 1).contains(&size) {
             return Err(OutOfRangeError {
                 value: size,
                 min: 13824,
@@ -65,7 +65,7 @@ impl Memory {
         })
     }
     
-    pub fn load_rom(&mut self, addr : u16, rom: &Vec<u8>) {
+    pub fn load_rom(&mut self, addr : u16, rom: &[u8]) {
         for (i, byte) in rom.iter().enumerate() {
             self.store(addr + (i as u16), *byte).unwrap();
         }
