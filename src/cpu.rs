@@ -23,6 +23,8 @@ pub struct Cpu {
     sr: u8,
 
     memory: Memory,
+
+    cycles_busy: u8
 }
 
 impl Cpu {
@@ -34,7 +36,8 @@ impl Cpu {
             x: 0,
             y: 0,
             sr: 0,
-            memory: mem
+            memory: mem,
+            cycles_busy: 0
         }
     }
 
@@ -55,70 +58,80 @@ impl Cpu {
                 instruction_size = 1;
                 Instruction { // BRK
                     operation: Operations::SoftwareInterrupt,
-                    operands: Addressing::Implied
+                    operands: Addressing::Implied,
+                    cycle_count: 7
                 }
             },
             0x09 => {
                 instruction_size = 2;
                 Instruction {  // ORA immediate
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap())
+                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
                 }
             },
             0x05 => {
                 instruction_size = 2;
                 Instruction { // ORA zeropage
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap())
+                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
                 }
             },
             0x15 => {
                 instruction_size = 2;
                 Instruction { // ORA indexed zeropage
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x)
+                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
                 }
             },
             0x0d => {
                 instruction_size = 3;
                 Instruction { // ORA absolute
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1))
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
                 }
             },
             0x1d => {
                 instruction_size = 3;
                 Instruction { // ORA absolute,X
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x)
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 4
                 }
             },
             0x19 => {
                 instruction_size = 3;
                 Instruction { // ORA absolute,Y
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y)
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    cycle_count: 4
                 }
             },
             0x01 => {
                 instruction_size = 2;
                 Instruction { // ORA (indirect,X)
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x)
+                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
                 }
             },
             0x11 => {
                 instruction_size = 2;
                 Instruction { /// ORA (indirect), Y
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y)
+                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 5
                 }
             },
             _ => {
                 instruction_size = 1;
                 Instruction {
                     operation: Operations::NoOperation,
-                    operands: Addressing::Implied
+                    operands: Addressing::Implied,
+                    cycle_count: 2
                 }
             }
         };
@@ -144,6 +157,7 @@ mod tests {
         assert_eq!(cpu.y, 0x0);
         assert_eq!(cpu.sr, 0x0);
         assert_eq!(cpu.memory.load(0x0000).unwrap(), 0);
+        assert_eq!(cpu.cycles_busy, 0);
     }
 
     #[test]
@@ -165,39 +179,48 @@ mod tests {
 
         assert_eq!(Instruction {
             operation: Operations::SoftwareInterrupt,
-            operands: Addressing::Implied
+            operands: Addressing::Implied,
+            cycle_count: 7
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::Immediate(0x0a)
+            operands: Addressing::Immediate(0x0a),
+            cycle_count: 2
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::Zeropage(0x01)
+            operands: Addressing::Zeropage(0x01),
+            cycle_count: 3
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::IndexedZeropage(0x01, 0x00)
+            operands: Addressing::IndexedZeropage(0x01, 0x00),
+            cycle_count: 4
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::Absolute(0x0201)
+            operands: Addressing::Absolute(0x0201),
+            cycle_count: 4
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::IndexedAbsolute(0x0201, 0x00)
+            operands: Addressing::IndexedAbsolute(0x0201, 0x00),
+            cycle_count: 4
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::IndexedAbsolute(0xa204, 0x00)
+            operands: Addressing::IndexedAbsolute(0xa204, 0x00),
+            cycle_count: 4
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::PreindexedIndirect(0x03, 0x00)
+            operands: Addressing::PreindexedIndirect(0x03, 0x00),
+            cycle_count: 6
         }, cpu.fetch());
         assert_eq!(Instruction {
             operation: Operations::InclusiveOrWithAccumulator,
-            operands: Addressing::PostindexedIndirect(0x03, 0x00)
+            operands: Addressing::PostindexedIndirect(0x03, 0x00),
+            cycle_count: 5
         }, cpu.fetch());
     }
 }
