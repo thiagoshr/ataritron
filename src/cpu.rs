@@ -174,7 +174,15 @@ impl Cpu {
                     operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
                     cycle_count: 7
                 }
-            }
+            },
+            0x08 => {
+                instruction_size = 1;
+                Instruction { // PHP implied
+                    operation: Operations::PushStatusRegister,
+                    operands: Addressing::Implied,
+                    cycle_count: 3
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
@@ -349,6 +357,28 @@ mod tests {
             operation: Operations::ArithmeticShiftLeft,
             operands: Addressing::IndexedAbsolute(0x4511, 0x0a),
             cycle_count: 7
+        }, cpu.fetch());
+    }
+
+    #[test]
+    fn can_fetch_php_instruction () {
+        let rom = vec![
+            0x08,
+            0x0a
+        ];
+        let mut mem = Memory::new(64*1024).unwrap();
+        mem.load_rom(0x1000, &rom);
+        let mut cpu = Cpu::new(mem);
+
+        assert_eq!(Instruction {
+            operation: Operations::PushStatusRegister,
+            operands: Addressing::Implied,
+            cycle_count: 3
+        }, cpu.fetch());
+        assert_eq!(Instruction {
+            operation: Operations::ArithmeticShiftLeft,
+            operands: Addressing::Implied,
+            cycle_count: 2
         }, cpu.fetch());
     }
 }
