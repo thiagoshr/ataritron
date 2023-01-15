@@ -24,6 +24,7 @@ pub struct Cpu {
 
     memory: Memory,
 
+    /// how many cycles the cpu needs to complete the running instruction
     cycles_busy: u8
 }
 
@@ -191,6 +192,23 @@ impl Cpu {
                     cycle_count: 2
                 }
             },
+            0x18 => {
+                instruction_size = 1;
+                Instruction { // CLC implied
+                    operation: Operations::ClearCarry,
+                    operands: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x20 => {
+                instruction_size = 3;
+                Instruction { // JSR absolute
+                    operation: Operations::JumpSubroutine,
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 6
+                }
+            },
+            
             _ => {
                 instruction_size = 1;
                 Instruction {
@@ -410,5 +428,39 @@ mod tests {
             operands: Addressing::Implied,
             cycle_count: 2
         }, cpu.fetch());
+    }
+
+    #[test]
+    fn can_fetch_clc_instruction () {
+        let rom = vec![
+            0x18
+        ];
+        let mut mem = Memory::new(64*1024).unwrap();
+        mem.load_rom(0x1000, &rom);
+        let mut cpu = Cpu::new(mem);
+
+        assert_eq!(Instruction {
+            operation: Operations::ClearCarry,
+            operands: Addressing::Implied,
+            cycle_count: 2
+        }, cpu.fetch());
+        assert_eq!(cpu.pc, 0x1001);
+    }
+
+    #[test]
+    fn can_fetch_jsr_instruction () {
+        let rom = vec![
+            0x20, 0xff, 0x10
+        ];
+        let mut mem = Memory::new(64*1024).unwrap();
+        mem.load_rom(0x1000, &rom);
+        let mut cpu = Cpu::new(mem);
+
+        assert_eq!(Instruction {
+            operation: Operations::JumpSubroutine,
+            operands: Addressing::Absolute(0x10ff),
+            cycle_count: 6
+        }, cpu.fetch());
+        assert_eq!(cpu.pc, 0x1003);
     }
 }
