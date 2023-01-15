@@ -1,4 +1,6 @@
 mod instructions;
+
+#[cfg(test)]
 mod tests;
 
 use crate::memory::{self, Memory};
