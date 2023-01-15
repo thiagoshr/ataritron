@@ -211,7 +211,70 @@ impl Cpu {
                     cycle_count: 6
                 }
             },
-            
+            0x29 => {
+                instruction_size = 2;
+                Instruction { // AND immediate
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x25 => {
+                instruction_size = 2;
+                Instruction { // AND zeropage
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x35 => {
+                instruction_size = 2;
+                Instruction { // AND zeropage,X
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x2d => {
+                instruction_size = 3;
+                Instruction { // AND absolute
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0x3d => {
+                instruction_size = 3;
+                Instruction { // AND absolute,X
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x39 => {
+                instruction_size = 3;
+                Instruction { // AND absolute,Y
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    cycle_count: 4
+                }
+            },
+            0x21 => {
+                instruction_size = 2;
+                Instruction { // AND (indirect,X)
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x31 => {
+                instruction_size = 2;
+                Instruction { // AND (indirect),Y
+                    operation: Operations::AndWithAccumulator,
+                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

@@ -56,7 +56,7 @@ fn resets_properly() {
 #[test]
 fn can_fetch_brk_ora_instructions() {
     let mut mem = Memory::new(16*1024).unwrap();
-    mem.load_rom(0x1000, &vec![
+    let rom = vec![
         0x00,
         0x09, 0x0a,
         0x05, 0x01,
@@ -66,7 +66,8 @@ fn can_fetch_brk_ora_instructions() {
         0x19, 0x04, 0xa2,
         0x01, 0x03,
         0x11, 0x03
-    ]);
+    ];
+    mem.load_rom(0x1000, &rom);
 
     let mut cpu = Cpu::new(mem);
 
@@ -115,18 +116,20 @@ fn can_fetch_brk_ora_instructions() {
         operands: Addressing::PostindexedIndirect(0x03, 0x00),
         cycle_count: 5
     }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
 #[test]
 fn can_fetch_asl_instructions() {
     let mut mem = Memory::new(16*1024).unwrap();
-    mem.load_rom(0x1000, &vec![
+    let rom = vec![
         0x0a,
         0x06, 0x0a,
         0x16, 0x01,
         0x0e, 0x10, 0x45,
         0x1e, 0x11, 0x45
-    ]);
+    ];
+    mem.load_rom(0x1000, &rom);
 
     let mut cpu = Cpu::new(mem);
     cpu.x = 0x0a;
@@ -156,6 +159,7 @@ fn can_fetch_asl_instructions() {
         operands: Addressing::IndexedAbsolute(0x4511, 0x0a),
         cycle_count: 7
     }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
 #[test]
@@ -178,6 +182,7 @@ fn can_fetch_php_instruction () {
         operands: Addressing::Implied,
         cycle_count: 2
     }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
 #[test]
@@ -200,6 +205,7 @@ fn can_fetch_bpl_instruction () {
         operands: Addressing::Implied,
         cycle_count: 2
     }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16)
 }
 
 #[test]
@@ -216,7 +222,7 @@ fn can_fetch_clc_instruction () {
         operands: Addressing::Implied,
         cycle_count: 2
     }, cpu.fetch());
-    assert_eq!(cpu.pc, 0x1001);
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
 #[test]
@@ -233,6 +239,66 @@ fn can_fetch_jsr_instruction () {
         operands: Addressing::Absolute(0x10ff),
         cycle_count: 6
     }, cpu.fetch());
-    assert_eq!(cpu.pc, 0x1003);
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
+#[test]
+fn can_fetch_and_instructions () {
+    let rom = vec![
+        0x29, 0x50,
+        0x25, 0x34,
+        0x35, 0x10,
+        0x2d, 0x00, 0x20,
+        0x3d, 0x00, 0x20,
+        0x39, 0x00, 0x20,
+        0x21, 0x15,
+        0x31, 0x30
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+    cpu.x = 0xa1;
+    cpu.y = 0xa2;
+
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::Immediate(0x50),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::Zeropage(0x34),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::IndexedZeropage(0x10, 0xa1),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::Absolute(0x2000),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::IndexedAbsolute(0x2000, 0xa1),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::IndexedAbsolute(0x2000, 0xa2),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::PreindexedIndirect(0x15, 0xa1),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AndWithAccumulator,
+        operands: Addressing::PostindexedIndirect(0x30, 0xa2),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
