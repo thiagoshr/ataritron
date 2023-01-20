@@ -72,7 +72,7 @@ impl Cpu {
                 instruction_size = 1;
                 Instruction { // BRK
                     operation: Operations::SoftwareInterrupt,
-                    operands: Addressing::Implied,
+                    addressing: Addressing::Implied,
                     cycle_count: 7
                 }
             },
@@ -80,7 +80,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction {  // ORA immediate
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 2
                 }
             },
@@ -88,7 +88,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // ORA zeropage
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 3
                 }
             },
@@ -96,7 +96,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // ORA indexed zeropage
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
                     cycle_count: 4
                 }
             },
@@ -104,7 +104,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // ORA absolute
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
                     cycle_count: 4
                 }
             },
@@ -112,7 +112,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // ORA absolute,X
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
                     cycle_count: 4
                 }
             },
@@ -120,7 +120,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // ORA absolute,Y
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
                     cycle_count: 4
                 }
             },
@@ -128,7 +128,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // ORA (indirect,X)
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
                     cycle_count: 6
                 }
             },
@@ -136,7 +136,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // ORA (indirect), Y
                     operation: Operations::InclusiveOrWithAccumulator,
-                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
                     cycle_count: 5
                 }
             },
@@ -144,7 +144,7 @@ impl Cpu {
                 instruction_size = 1;
                 Instruction { // ASL accumulator (implied)
                     operation: Operations::ArithmeticShiftLeft,
-                    operands: Addressing::Implied,
+                    addressing: Addressing::Implied,
                     cycle_count: 2
                 }
             },
@@ -152,7 +152,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // ASL zeropage 
                     operation: Operations::ArithmeticShiftLeft,
-                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 5
                 }
             },
@@ -160,7 +160,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { /// ASL zeropage,X
                     operation: Operations::ArithmeticShiftLeft,
-                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
                     cycle_count: 6
                 }
             },
@@ -168,7 +168,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // ASL absolute
                     operation: Operations::ArithmeticShiftLeft,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
                     cycle_count: 6
                 }
             },
@@ -176,7 +176,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // ASL absolute, X
                     operation: Operations::ArithmeticShiftLeft,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
                     cycle_count: 7
                 }
             },
@@ -184,7 +184,7 @@ impl Cpu {
                 instruction_size = 1;
                 Instruction { // PHP implied
                     operation: Operations::PushStatusRegister,
-                    operands: Addressing::Implied,
+                    addressing: Addressing::Implied,
                     cycle_count: 3
                 }
             },
@@ -192,7 +192,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // BPL relative
                     operation: Operations::BranchOnPlus,
-                    operands: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 2
                 }
             },
@@ -200,7 +200,7 @@ impl Cpu {
                 instruction_size = 1;
                 Instruction { // CLC implied
                     operation: Operations::ClearCarry,
-                    operands: Addressing::Implied,
+                    addressing: Addressing::Implied,
                     cycle_count: 2
                 }
             },
@@ -208,7 +208,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // JSR absolute
                     operation: Operations::JumpSubroutine,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
                     cycle_count: 6
                 }
             },
@@ -216,7 +216,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // AND immediate
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 2
                 }
             },
@@ -224,7 +224,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // AND zeropage
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 3
                 }
             },
@@ -232,7 +232,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // AND zeropage,X
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
                     cycle_count: 4
                 }
             },
@@ -240,7 +240,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // AND absolute
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
                     cycle_count: 4
                 }
             },
@@ -248,7 +248,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // AND absolute,X
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
                     cycle_count: 4
                 }
             },
@@ -256,7 +256,7 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // AND absolute,Y
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
                     cycle_count: 4
                 }
             },
@@ -264,7 +264,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // AND (indirect,X)
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
                     cycle_count: 6
                 }
             },
@@ -272,7 +272,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // AND (indirect),Y
                     operation: Operations::AndWithAccumulator,
-                    operands: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
                     cycle_count: 5
                 }
             },
@@ -280,7 +280,7 @@ impl Cpu {
                 instruction_size = 2;
                 Instruction { // BIT zeropage
                     operation: Operations::BitTest,
-                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
                     cycle_count: 3
                 }
             },
@@ -288,15 +288,55 @@ impl Cpu {
                 instruction_size = 3;
                 Instruction { // BIT absolute
                     operation: Operations::BitTest,
-                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
                     cycle_count: 4
+                }
+            },
+            0x2a => {
+                instruction_size = 1;
+                Instruction { // ROL accumulator
+                    operation: Operations::RotateLeft,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x26 => {
+                instruction_size = 2;
+                Instruction { // ROL zeropage
+                    operation: Operations::RotateLeft,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 5
+                }
+            },
+            0x36 => {
+                instruction_size = 2;
+                Instruction { // ROL zeropage, X
+                    operation: Operations::RotateLeft,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x2e => {
+                instruction_size = 3;
+                Instruction { // ROL absolute
+                    operation: Operations::RotateLeft,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 6
+                }
+            },
+            0x3e => {
+                instruction_size = 3;
+                Instruction { // ROL absolute, X
+                    operation: Operations::RotateLeft,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 7
                 }
             },
             _ => {
                 instruction_size = 1;
                 Instruction {
                     operation: Operations::NoOperation,
-                    operands: Addressing::Implied,
+                    addressing: Addressing::Implied,
                     cycle_count: 2
                 }
             }

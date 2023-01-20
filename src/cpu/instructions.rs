@@ -97,11 +97,11 @@ impl PartialEq for Operations {
 #[derive(Debug)]
 pub struct Instruction {
     pub operation : Operations,
-    pub operands : Addressing,
+    pub addressing : Addressing,
     pub cycle_count : u16,
 }
 impl PartialEq for Instruction {
     fn eq(&self, other: &Self) -> bool {
-        self.operation == other.operation && self.operands == other.operands && self.cycle_count == other.cycle_count
+        self.operation == other.operation && self.addressing == other.addressing && self.cycle_count == other.cycle_count
     }
 }
