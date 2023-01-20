@@ -276,6 +276,22 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0x24 => {
+                instruction_size = 2;
+                Instruction { // BIT zeropage
+                    operation: Operations::BitTest,
+                    operands: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x2c => {
+                instruction_size = 3;
+                Instruction { // BIT absolute
+                    operation: Operations::BitTest,
+                    operands: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
