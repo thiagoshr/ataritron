@@ -5,8 +5,8 @@ enum CpuFlags {
     Zero = 1,
     InterruptDisable = 2,
     _Decimal = 3,
-    _Unused = 4,
-    _Bflag = 5,
+    BreakFlag = 4,
+    _unused = 5,
     Overflow = 6,
     Negative = 7
 }
@@ -38,6 +38,7 @@ mod tests {
         assert_eq!(false, cpu.get_flag(CpuFlags::Carry));
         assert_eq!(true, cpu.get_flag(CpuFlags::Zero));
         assert_eq!(false, cpu.get_flag(CpuFlags::InterruptDisable));
+        assert_eq!(false, cpu.get_flag(CpuFlags::BreakFlag));
         assert_eq!(false, cpu.get_flag(CpuFlags::Overflow));
         assert_eq!(true, cpu.get_flag(CpuFlags::Negative));
 
@@ -45,6 +46,7 @@ mod tests {
         assert_eq!(true, cpu.get_flag(CpuFlags::Carry));
         assert_eq!(false, cpu.get_flag(CpuFlags::Zero));
         assert_eq!(true, cpu.get_flag(CpuFlags::InterruptDisable));
+        assert_eq!(true, cpu.get_flag(CpuFlags::BreakFlag));
         assert_eq!(true, cpu.get_flag(CpuFlags::Overflow));
         assert_eq!(false, cpu.get_flag(CpuFlags::Negative));
     }
@@ -57,9 +59,10 @@ mod tests {
         cpu.set_flag(CpuFlags::Carry);
         cpu.set_flag(CpuFlags::Zero);
         cpu.set_flag(CpuFlags::InterruptDisable);
+        cpu.set_flag(CpuFlags::BreakFlag);
         cpu.set_flag(CpuFlags::Overflow);
         cpu.set_flag(CpuFlags::Negative);
 
-        assert_eq!(0b11000111, cpu.sr);
+        assert_eq!(0b11010111, cpu.sr);
     }
 }
