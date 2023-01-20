@@ -6,7 +6,7 @@ enum CpuFlags {
     InterruptDisable = 2,
     _Decimal = 3,
     BreakFlag = 4,
-    _unused = 5,
+    _Unused = 5,
     Overflow = 6,
     Negative = 7
 }
@@ -64,5 +64,21 @@ mod tests {
         cpu.set_flag(CpuFlags::Negative);
 
         assert_eq!(0b11010111, cpu.sr);
+    }
+
+    #[test]
+    fn can_clear_flags() {
+        let mem = Memory::new(64*1024).unwrap();
+        let mut cpu = Cpu::new(mem);
+
+        cpu.sr = 0b11111111;
+        cpu.clear_flag(CpuFlags::Carry);
+        cpu.clear_flag(CpuFlags::Zero);
+        cpu.clear_flag(CpuFlags::InterruptDisable);
+        cpu.clear_flag(CpuFlags::BreakFlag);
+        cpu.clear_flag(CpuFlags::Overflow);
+        cpu.clear_flag(CpuFlags::Negative);
+
+        assert_eq!(0b00101000, cpu.sr);
     }
 }

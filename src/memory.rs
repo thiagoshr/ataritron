@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn load_errors_on_out_of_bounds() {
-        let mut mem = Memory::new(16 * 1024).unwrap(); // 16kB
+        let mem = Memory::new(16 * 1024).unwrap(); // 16kB
         assert!(mem.load(0x4000).is_err()); // top bound == 0x3999
     }
 
