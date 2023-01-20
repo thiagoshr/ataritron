@@ -1,4 +1,5 @@
 mod instructions;
+mod flags;
 
 #[cfg(test)]
 mod tests;
