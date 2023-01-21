@@ -368,3 +368,32 @@ fn can_fetch_rol_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_bmi_sec_rti_instructions() {
+    let rom = vec![
+        0x30, 0x24,
+        0x38,
+        0x40
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnMinus,
+        addressing: Addressing::RelativeAddress(0x24),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::SetCarry,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ReturnFromInterrupt,
+        addressing: Addressing::Implied,
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

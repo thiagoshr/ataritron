@@ -332,6 +332,30 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
+            0x30 => {
+                instruction_size = 2;
+                Instruction { // BMI relative
+                    operation: Operations::BranchOnMinus,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x38 => {
+                instruction_size = 1;
+                Instruction { // SEC
+                    operation: Operations::SetCarry,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x40 => {
+                instruction_size = 1;
+                Instruction { // RTI 
+                    operation: Operations::ReturnFromInterrupt,
+                    addressing: Addressing::Implied,
+                    cycle_count: 6
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
