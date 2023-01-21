@@ -356,6 +356,70 @@ impl Cpu {
                     cycle_count: 6
                 }
             },
+            0x49 => {
+                instruction_size = 2;
+                Instruction { // EOR immediate
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x45 => {
+                instruction_size = 2;
+                Instruction { // EOR zeropage
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x55 => {
+                instruction_size = 2;
+                Instruction { // EOR zeropage, X
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x4d => {
+                instruction_size = 3;
+                Instruction { // EOR absolute
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0x5d => {
+                instruction_size = 3;
+                Instruction { // EOR absolute,X
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x59 => {
+                instruction_size = 3;
+                Instruction { // EOR absolute,Y
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    cycle_count: 4
+                }
+            },
+            0x41 => {
+                instruction_size = 2;
+                Instruction { // EOR (indirect,X)
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x51 => {
+                instruction_size = 2;
+                Instruction { // EOR (indirect),Y
+                    operation: Operations::ExclusiveOrWithAccumulator,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

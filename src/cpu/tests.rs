@@ -397,3 +397,66 @@ fn can_fetch_bmi_sec_rti_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_eor_instructions() {
+    let rom = vec![
+        0x49, 0x20,
+        0x45, 0x02,
+        0x55, 0x08,
+        0x4d, 0xfe, 0xff,
+        0x5d, 0x02, 0x02,
+        0x59, 0x03, 0x00,
+        0x41, 0x80,
+        0x51, 0x70
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x05;
+    cpu.y = 0x10;
+
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::Immediate(0x20),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::Zeropage(0x02),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::IndexedZeropage(0x08, 0x05),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::Absolute(0xfffe),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x0202, 0x05),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x0003, 0x10),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::PreindexedIndirect(0x80, 0x05),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ExclusiveOrWithAccumulator,
+        addressing: Addressing::PostindexedIndirect(0x70, 0x10),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
