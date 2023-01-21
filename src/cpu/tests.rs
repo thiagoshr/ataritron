@@ -460,3 +460,47 @@ fn can_fetch_eor_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_lsr_instructions() {
+    let rom = vec![
+        0x4a,
+        0x46, 0x07,
+        0x56, 0x06,
+        0x4e, 0x01, 0x12,
+        0x5e, 0x04, 0x12
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x02;
+
+    assert_eq!(Instruction {
+        operation: Operations::LogicalShiftRight,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LogicalShiftRight,
+        addressing: Addressing::Zeropage(0x07),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LogicalShiftRight,
+        addressing: Addressing::IndexedZeropage(0x06, 0x02),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LogicalShiftRight,
+        addressing: Addressing::Absolute(0x1201),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LogicalShiftRight,
+        addressing: Addressing::IndexedAbsolute(0x1204, 0x02),
+        cycle_count: 7
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

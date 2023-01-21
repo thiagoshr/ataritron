@@ -59,7 +59,7 @@ pub enum Operations {
     ExclusiveOrWithAccumulator,
     InclusiveOrWithAccumulator,
     ArithmeticShiftLeft,
-    LogicalShiftLeft,
+    LogicalShiftRight,
     RotateLeft,
     RotateRight,
     ClearCarry,

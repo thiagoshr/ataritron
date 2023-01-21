@@ -420,6 +420,46 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0x4a => {
+                instruction_size = 1;
+                Instruction { // LSR accumulator
+                    operation: Operations::LogicalShiftRight,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x46 => {
+                instruction_size = 2;
+                Instruction { // LSR zeropage
+                    operation: Operations::LogicalShiftRight,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 5
+                }
+            },
+            0x56 => {
+                instruction_size = 2;
+                Instruction { // LSR zeropage,X
+                    operation: Operations::LogicalShiftRight,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x4e => {
+                instruction_size = 3;
+                Instruction { // LSR absolute
+                    operation: Operations::LogicalShiftRight,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 6
+                }
+            },
+            0x5e => {
+                instruction_size = 3;
+                Instruction { // LSR absolute,X
+                    operation: Operations::LogicalShiftRight,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 7
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
