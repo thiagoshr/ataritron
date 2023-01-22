@@ -500,6 +500,70 @@ impl Cpu {
                     cycle_count: 6
                 }
             },
+            0x69 => {
+                instruction_size = 2;
+                Instruction { // ADC immediate
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x65 => {
+                instruction_size = 2;
+                Instruction { // ADC zeropage
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x75 => {
+                instruction_size = 2;
+                Instruction { // ADC zeropage,X
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x6d => {
+                instruction_size = 3;
+                Instruction { // ADC absolute
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0x7d => {
+                instruction_size = 3;
+                Instruction { // ADC absolute,X
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x79 => {
+                instruction_size = 3;
+                Instruction { // ADC absolute,Y
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    cycle_count: 4
+                }
+            },
+            0x61 => {
+                instruction_size = 2;
+                Instruction { // ADC (indirect,X)
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x71 => {
+                instruction_size = 2;
+                Instruction { // ADC (indirect),Y
+                    operation: Operations::AddWithCarry,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

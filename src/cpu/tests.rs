@@ -546,3 +546,65 @@ fn can_fetch_jmp_bvc_cli_rts_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_adc_instructions() {
+    let rom = vec![
+        0x69, 0x83,
+        0x65, 0x10,
+        0x75, 0x10,
+        0x6d, 0x37, 0xe0,
+        0x7d, 0x38, 0xe1,
+        0x79, 0x39, 0xe2,
+        0x61, 0x00,
+        0x71, 0x80
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x01;
+    cpu.y = 0x02;
+
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::Immediate(0x83),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::Zeropage(0x10),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::IndexedZeropage(0x10, 0x01),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::Absolute(0xe037),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::IndexedAbsolute(0xe138, 0x01),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::IndexedAbsolute(0xe239, 0x02),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::PreindexedIndirect(0x00, 0x01),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::AddWithCarry,
+        addressing: Addressing::PostindexedIndirect(0x80, 0x02),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
