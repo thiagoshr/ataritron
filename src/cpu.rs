@@ -604,6 +604,78 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
+            0x70 => {
+                instruction_size = 2;
+                Instruction { // BVS relative
+                    operation: Operations::BranchOnOverflowSet,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x78 => {
+                instruction_size = 1;
+                Instruction { // SEI
+                    operation: Operations::SetInterruptDisable,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x85 => {
+                instruction_size = 2;
+                Instruction { // STA zeropage
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x95 => {
+                instruction_size = 2;
+                Instruction { // STA zeropage,X
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x8d => {
+                instruction_size = 3;
+                Instruction { // STA absolute
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0x9d => {
+                instruction_size = 3;
+                Instruction { // STA absolute,X
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 5
+                }
+            },
+            0x99 => {
+                instruction_size = 3;
+                Instruction { // STA absolute,Y
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.y),
+                    cycle_count: 5
+                }
+            },
+            0x81 => {
+                instruction_size = 2;
+                Instruction { // STA (indirect,X)
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x91 => {
+                instruction_size = 2;
+                Instruction { // STA (indirect),Y
+                    operation: Operations::StoreAccumulator,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 6
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

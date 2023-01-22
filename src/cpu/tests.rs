@@ -651,3 +651,72 @@ fn can_fetch_ror_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_bvs_sei_sta_instructions() {
+    let rom = vec![
+        0x70, 0x02,
+        0x78,
+        0x85, 0x05,
+        0x95, 0x10,
+        0x8d, 0x00, 0x38,
+        0x9d, 0x01, 0x38,
+        0x99, 0x08, 0x38,
+        0x81, 0x50,
+        0x91, 0x53
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x5;
+    cpu.y = 0x6;
+
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnOverflowSet,
+        addressing: Addressing::RelativeAddress(0x02),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::SetInterruptDisable,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::Zeropage(0x05),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::IndexedZeropage(0x10, 0x5),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::Absolute(0x3800),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x3801, 0x05),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x3808, 0x06),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::PreindexedIndirect(0x50, 0x05),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreAccumulator,
+        addressing: Addressing::PostindexedIndirect(0x53, 0x06),
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
