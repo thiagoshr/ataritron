@@ -564,6 +564,46 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0x6a => {
+                instruction_size = 1;
+                Instruction { // ROR accumulator
+                    operation: Operations::RotateRight,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x66 => {
+                instruction_size = 2;
+                Instruction { // ROR zeropage
+                    operation: Operations::RotateRight,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 5
+                }
+            },
+            0x76 => {
+                instruction_size = 2;
+                Instruction { // ROR zeropage,X
+                    operation: Operations::RotateRight,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 6
+                }
+            },
+            0x6e => {
+                instruction_size = 3;
+                Instruction { // ROR absolute
+                    operation: Operations::RotateRight,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 6
+                }
+            },
+            0x7e => {
+                instruction_size = 3;
+                Instruction { // ROR absolute,X
+                    operation: Operations::RotateRight,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 7
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
