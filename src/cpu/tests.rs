@@ -504,3 +504,45 @@ fn can_fetch_lsr_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_jmp_bvc_cli_rts_instructions() {
+    let rom = vec![
+        0x4c, 0x13, 0x20,
+        0x6c, 0x15, 0x17,
+        0x50, 0xfc,
+        0x58,
+        0x60
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::Jump,
+        addressing: Addressing::Absolute(0x2013),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::Jump,
+        addressing: Addressing::Indirect(0x1715),
+        cycle_count: 5
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnOverflowClear,
+        addressing: Addressing::RelativeAddress(0xfc),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ClearInterruptDisable,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::ReturnFromSubroutine,
+        addressing: Addressing::Implied,
+        cycle_count: 6
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

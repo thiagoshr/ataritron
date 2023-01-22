@@ -460,6 +460,46 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
+            0x4c => {
+                instruction_size = 3;
+                Instruction { // JMP absolute
+                    operation: Operations::Jump,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 3
+                }
+            },
+            0x6c => {
+                instruction_size = 3;
+                Instruction { // JMP indirect
+                    operation: Operations::Jump,
+                    addressing: Addressing::Indirect(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 5
+                }
+            },
+            0x50 => {
+                instruction_size = 2;
+                Instruction { // BVC relative
+                    operation: Operations::BranchOnOverflowClear,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x58 => {
+                instruction_size = 1;
+                Instruction { // CLI
+                    operation: Operations::ClearInterruptDisable,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x60 => {
+                instruction_size = 1;
+                Instruction { // RTS
+                    operation: Operations::ReturnFromSubroutine,
+                    addressing: Addressing::Implied,
+                    cycle_count: 6
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
