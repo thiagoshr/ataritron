@@ -676,6 +676,54 @@ impl Cpu {
                     cycle_count: 6
                 }
             },
+            0x84 => {
+                instruction_size = 2;
+                Instruction { // STY zeropage
+                    operation: Operations::StoreY,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x94 => {
+                instruction_size = 2;
+                Instruction { // STY zeropage,X
+                    operation: Operations::StoreY,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0x8c => {
+                instruction_size = 3;
+                Instruction { // STY absolute
+                    operation: Operations::StoreY,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0x86 => {
+                instruction_size = 2;
+                Instruction { // STX zeropage
+                    operation: Operations::StoreX,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0x96 => {
+                instruction_size = 2;
+                Instruction { // STX zeropage,Y
+                    operation: Operations::StoreX,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.y),
+                    cycle_count: 4
+                }
+            },
+            0x8e => {
+                instruction_size = 3;
+                Instruction { // STX absolute
+                    operation: Operations::StoreX,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

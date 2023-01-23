@@ -720,3 +720,53 @@ fn can_fetch_bvs_sei_sta_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_stx_sty_instructions() {
+    let rom = vec![
+        0x86, 0x03,
+        0x96, 0x04,
+        0x8e, 0x05, 0x01,
+        0x84, 0x00,
+        0x94, 0x01,
+        0x8c, 0x06, 0x01
+    ];
+    let mut mem = Memory::new(64 * 1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x8;
+    cpu.y = 0x9;
+
+    assert_eq!(Instruction {
+        operation: Operations::StoreX,
+        addressing: Addressing::Zeropage(0x03),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreX,
+        addressing: Addressing::IndexedZeropage(0x04, 0x09),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreX,
+        addressing: Addressing::Absolute(0x0105),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreY,
+        addressing: Addressing::Zeropage(0x00),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreY,
+        addressing: Addressing::IndexedZeropage(0x01, 0x08),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::StoreY,
+        addressing: Addressing::Absolute(0x0106),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
