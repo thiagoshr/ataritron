@@ -918,3 +918,45 @@ fn can_fetch_lda_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_tay_tax_bcs_clv_tsx_instructions() {
+    let rom = vec![
+        0xa8,
+        0xaa,
+        0xb0, 0xf3,
+        0xb8,
+        0xba
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::TransferAccumulatorToY,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::TransferAccumulatorToX,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnCarrySet,
+        addressing: Addressing::RelativeAddress(0xf3),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::ClearOverflow,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::TransferStackPointerToX,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

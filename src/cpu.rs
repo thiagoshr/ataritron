@@ -868,6 +868,46 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0xa8 => {
+                instruction_size = 1;
+                Instruction { // TAY
+                    operation: Operations::TransferAccumulatorToY,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xaa => {
+                instruction_size = 1;
+                Instruction { // TAX
+                    operation: Operations::TransferAccumulatorToX,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xb0 => {
+                instruction_size = 2;
+                Instruction { // BCS
+                    operation: Operations::BranchOnCarrySet,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xb8 => {
+                instruction_size = 1;
+                Instruction { // CLV
+                    operation: Operations::ClearOverflow,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xba => {
+                instruction_size = 1;
+                Instruction { // TSX
+                    operation: Operations::TransferStackPointerToX,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
