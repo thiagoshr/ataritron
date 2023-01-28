@@ -804,6 +804,70 @@ impl Cpu {
                     cycle_count: 4
                 }
             },
+            0xa9 => {
+                instruction_size = 2;
+                Instruction { // LDA immediate
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xa5 => {
+                instruction_size = 2;
+                Instruction { // LDA zeropage
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xb5 => {
+                instruction_size = 2;
+                Instruction { // LDA zeropage,X
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xad => {
+                instruction_size = 3;
+                Instruction { // LDA absolute
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
+            0xbd => {
+                instruction_size = 3;
+                Instruction { // LDA absolute,X
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xb9 => {
+                instruction_size = 3;
+                Instruction { // LDA absolute,Y
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.y),
+                    cycle_count: 4
+                }
+            },
+            0xa1 => {
+                instruction_size = 2;
+                Instruction { // LDA (indirect,X)
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 6
+                }
+            },
+            0xb1 => {
+                instruction_size = 2;
+                Instruction { // LDA (indirect), Y
+                    operation: Operations::LoadAccumulator,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1)?, self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

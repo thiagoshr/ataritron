@@ -856,3 +856,65 @@ fn can_fetch_ldy_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_lda_instructions() {
+    let rom = vec![
+        0xa9, 0xba,
+        0xa5, 0x11,
+        0xb5, 0x23,
+        0xad, 0x50, 0x23,
+        0xbd, 0x04, 0x23,
+        0xb9, 0x77, 0x42,
+        0xa1, 0x80,
+        0xb1, 0x33
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 5;
+    cpu.y = 7;
+
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::Immediate(0xba),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::Zeropage(0x11),
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::IndexedZeropage(0x23, 5),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::Absolute(0x2350),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x2304, 5),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x4277, 7),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::PreindexedIndirect(0x80, 5),
+        cycle_count: 6
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadAccumulator,
+        addressing: Addressing::PostindexedIndirect(0x33, 7),
+        cycle_count: 5
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
