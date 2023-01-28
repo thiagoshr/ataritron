@@ -23,8 +23,8 @@ fn loads_little_endian_word () {
     mem.load_rom(0xfffe, &vec![0xdc, 0xba]);
 
     let cpu = Cpu::new(mem);
-    assert_eq!(0xcdab, cpu.load_little_endian_u16(0x0000));
-    assert_eq!(0xbadc, cpu.load_little_endian_u16(0xfffe));
+    assert_eq!(0xcdab, cpu.load_little_endian_u16(0x0000).unwrap());
+    assert_eq!(0xbadc, cpu.load_little_endian_u16(0xfffe).unwrap());
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn resets_properly() {
     assert_eq!(cpu.x, 0x0);
     assert_eq!(cpu.y, 0x0);
     assert_eq!(cpu.sr, 0x0);
-    assert_eq!(cpu.load_little_endian_u16(0xfffc), 0x0302);
+    assert_eq!(cpu.load_little_endian_u16(0xfffc).unwrap(), 0x0302);
     assert_eq!(cpu.cycles_busy, 1);
 }
 
@@ -75,47 +75,47 @@ fn can_fetch_brk_ora_instructions() {
         operation: Operations::SoftwareInterrupt,
         addressing: Addressing::Implied,
         cycle_count: 7
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::Immediate(0x0a),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::Zeropage(0x01),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::IndexedZeropage(0x01, 0x00),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::Absolute(0x0201),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0x0201, 0x00),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0xa204, 0x00),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::PreindexedIndirect(0x03, 0x00),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::InclusiveOrWithAccumulator,
         addressing: Addressing::PostindexedIndirect(0x03, 0x00),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -138,27 +138,27 @@ fn can_fetch_asl_instructions() {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::Zeropage(0x0a),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::IndexedZeropage(0x01, 0x0a),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::Absolute(0x4510),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::IndexedAbsolute(0x4511, 0x0a),
         cycle_count: 7
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -176,12 +176,12 @@ fn can_fetch_php_instruction () {
         operation: Operations::PushStatusRegister,
         addressing: Addressing::Implied,
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -199,12 +199,12 @@ fn can_fetch_bpl_instruction () {
         operation: Operations::BranchOnPlus,
         addressing: Addressing::RelativeAddress(0x1b),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ArithmeticShiftLeft,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16)
 }
 
@@ -221,7 +221,7 @@ fn can_fetch_clc_instruction () {
         operation: Operations::ClearCarry,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -238,7 +238,7 @@ fn can_fetch_jsr_instruction () {
         operation: Operations::JumpSubroutine,
         addressing: Addressing::Absolute(0x10ff),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -264,42 +264,42 @@ fn can_fetch_and_instructions () {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::Immediate(0x50),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::Zeropage(0x34),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::IndexedZeropage(0x10, 0xa1),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::Absolute(0x2000),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0x2000, 0xa1),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0x2000, 0xa2),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::PreindexedIndirect(0x15, 0xa1),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AndWithAccumulator,
         addressing: Addressing::PostindexedIndirect(0x30, 0xa2),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -317,12 +317,12 @@ fn can_fetch_bit_instructions() {
         operation: Operations::BitTest,
         addressing: Addressing::Zeropage(0x80),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::BitTest,
         addressing: Addressing::Absolute(0x9998),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -345,27 +345,27 @@ fn can_fetch_rol_instructions() {
         operation: Operations::RotateLeft,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateLeft,
         addressing: Addressing::Zeropage(0x55),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateLeft,
         addressing: Addressing::IndexedZeropage(0xcc, 0x15),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateLeft,
         addressing: Addressing::Absolute(0xccaa),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateLeft,
         addressing: Addressing::IndexedAbsolute(0xaacc, 0x15),
         cycle_count: 7
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -384,17 +384,17 @@ fn can_fetch_bmi_sec_rti_instructions() {
         operation: Operations::BranchOnMinus,
         addressing: Addressing::RelativeAddress(0x24),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::SetCarry,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ReturnFromInterrupt,
         addressing: Addressing::Implied,
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -422,42 +422,42 @@ fn can_fetch_eor_instructions() {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::Immediate(0x20),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::Zeropage(0x02),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::IndexedZeropage(0x08, 0x05),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::Absolute(0xfffe),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0x0202, 0x05),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::IndexedAbsolute(0x0003, 0x10),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::PreindexedIndirect(0x80, 0x05),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ExclusiveOrWithAccumulator,
         addressing: Addressing::PostindexedIndirect(0x70, 0x10),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -481,27 +481,27 @@ fn can_fetch_lsr_instructions() {
         operation: Operations::LogicalShiftRight,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LogicalShiftRight,
         addressing: Addressing::Zeropage(0x07),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LogicalShiftRight,
         addressing: Addressing::IndexedZeropage(0x06, 0x02),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LogicalShiftRight,
         addressing: Addressing::Absolute(0x1201),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LogicalShiftRight,
         addressing: Addressing::IndexedAbsolute(0x1204, 0x02),
         cycle_count: 7
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -523,27 +523,27 @@ fn can_fetch_jmp_bvc_cli_rts_instructions() {
         operation: Operations::Jump,
         addressing: Addressing::Absolute(0x2013),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::Jump,
         addressing: Addressing::Indirect(0x1715),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::BranchOnOverflowClear,
         addressing: Addressing::RelativeAddress(0xfc),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ClearInterruptDisable,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::ReturnFromSubroutine,
         addressing: Addressing::Implied,
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -570,42 +570,42 @@ fn can_fetch_adc_instructions() {
         operation: Operations::AddWithCarry,
         addressing: Addressing::Immediate(0x83),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::Zeropage(0x10),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::IndexedZeropage(0x10, 0x01),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::Absolute(0xe037),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::IndexedAbsolute(0xe138, 0x01),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::IndexedAbsolute(0xe239, 0x02),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::PreindexedIndirect(0x00, 0x01),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::AddWithCarry,
         addressing: Addressing::PostindexedIndirect(0x80, 0x02),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -628,27 +628,27 @@ fn can_fetch_ror_instructions() {
         operation: Operations::RotateRight,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateRight,
         addressing: Addressing::Zeropage(0x41),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateRight,
         addressing: Addressing::IndexedZeropage(0x42, 0x10),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateRight,
         addressing: Addressing::Absolute(0x0a20),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::RotateRight,
         addressing: Addressing::IndexedAbsolute(0x0a21, 0x10),
         cycle_count: 7
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -677,47 +677,47 @@ fn can_fetch_bvs_sei_sta_instructions() {
         operation: Operations::BranchOnOverflowSet,
         addressing: Addressing::RelativeAddress(0x02),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::SetInterruptDisable,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::Zeropage(0x05),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::IndexedZeropage(0x10, 0x5),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::Absolute(0x3800),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::IndexedAbsolute(0x3801, 0x05),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::IndexedAbsolute(0x3808, 0x06),
         cycle_count: 5
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::PreindexedIndirect(0x50, 0x05),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreAccumulator,
         addressing: Addressing::PostindexedIndirect(0x53, 0x06),
         cycle_count: 6
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -742,32 +742,32 @@ fn can_fetch_stx_sty_instructions() {
         operation: Operations::StoreX,
         addressing: Addressing::Zeropage(0x03),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreX,
         addressing: Addressing::IndexedZeropage(0x04, 0x09),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreX,
         addressing: Addressing::Absolute(0x0105),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreY,
         addressing: Addressing::Zeropage(0x00),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreY,
         addressing: Addressing::IndexedZeropage(0x01, 0x08),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::StoreY,
         addressing: Addressing::Absolute(0x0106),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -790,27 +790,27 @@ fn can_fetch_dey_txa_bcc_tya_txs_instructions() {
         operation: Operations::DecrementY,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::TransferXToAccumulator,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::BranchOnCarryClear,
         addressing: Addressing::RelativeAddress(0xf6),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::TransferYToAccumulator,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::TransferXToStackPointer,
         addressing: Addressing::Implied,
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
 
@@ -833,26 +833,26 @@ fn can_fetch_ldy_instructions() {
         operation: Operations::LoadY,
         addressing: Addressing::Immediate(0x10),
         cycle_count: 2
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LoadY,
         addressing: Addressing::Zeropage(0x03),
         cycle_count: 3
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LoadY,
         addressing: Addressing::IndexedZeropage(0x04, 0x01),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LoadY,
         addressing: Addressing::Absolute(0x3002),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(Instruction {
         operation: Operations::LoadY,
         addressing: Addressing::IndexedAbsolute(0x3003, 0x01),
         cycle_count: 4
-    }, cpu.fetch());
+    }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
