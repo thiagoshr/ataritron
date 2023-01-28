@@ -990,3 +990,66 @@ fn can_fetch_cpy_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_cmp_instructions() {
+    let rom = vec![
+        0xc9, 0x00,
+        0xc5, 0x01,
+        0xd5, 0x02,
+        0xcd, 0x03, 0x01,
+        0xdd, 0x04, 0x02,
+        0xd9, 0x05, 0x03,
+        0xc1, 0x06,
+        0xd1, 0x07
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x08;
+    cpu.y = 0x09;
+
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::Immediate(0x00),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::Zeropage(0x01),
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::IndexedZeropage(0x02, 0x08),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::Absolute(0x0103),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x0204, 0x08),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::IndexedAbsolute(0x0305, 0x09),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::PreindexedIndirect(0x06, 0x08),
+        cycle_count: 6
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithAccumulator,
+        addressing: Addressing::PostindexedIndirect(0x07, 0x09),
+        cycle_count: 5
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

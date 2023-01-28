@@ -932,6 +932,70 @@ impl Cpu {
                     cycle_count: 4
                 }
             },
+            0xc9 => {
+                instruction_size = 2;
+                Instruction { // CMP immediate
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xc5 => {
+                instruction_size = 2;
+                Instruction { // CMP zeropage
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xd5 => {
+                instruction_size = 2;
+                Instruction { // CMP zeropage,X
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xcd => {
+                instruction_size = 3;
+                Instruction { // CMP absolute
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
+            0xdd => {
+                instruction_size = 3;
+                Instruction { // CMP absolute,X
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xd9 => {
+                instruction_size = 3;
+                Instruction { // CMP absolute, Y
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.y),
+                    cycle_count: 4
+                }
+            },
+            0xc1 => {
+                instruction_size = 2;
+                Instruction { // CMP (indirect,X)
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 6
+                }
+            },
+            0xd1 => {
+                instruction_size = 2;
+                Instruction { // CMP (indirect),Y
+                    operation: Operations::CompareWithAccumulator,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1)?, self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
