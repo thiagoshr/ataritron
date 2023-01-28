@@ -908,6 +908,30 @@ impl Cpu {
                     cycle_count: 2
                 }
             },
+            0xc0 => {
+                instruction_size = 2;
+                Instruction { // CPY immediate
+                    operation: Operations::CompareWithY,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xc4 => {
+                instruction_size = 2;
+                Instruction { // CPY zeropage
+                    operation: Operations::CompareWithY,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xcc => {
+                instruction_size = 3;
+                Instruction { // CPY absolute
+                    operation: Operations::CompareWithY,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

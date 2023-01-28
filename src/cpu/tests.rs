@@ -960,3 +960,33 @@ fn can_fetch_tay_tax_bcs_clv_tsx_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_cpy_instructions() {
+    let rom = vec![
+        0xc0, 0x0a,
+        0xc4, 0xf0,
+        0xcc, 0x08, 0x50
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithY,
+        addressing: Addressing::Immediate(0x0a),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithY,
+        addressing: Addressing::Zeropage(0xf0),
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithY,
+        addressing: Addressing::Absolute(0x5008),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
