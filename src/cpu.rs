@@ -764,6 +764,46 @@ impl Cpu {
                     cycle_count: 2
                 }
             },
+            0xa0 => {
+                instruction_size = 2;
+                Instruction { // LDY immediate
+                    operation: Operations::LoadY,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0xa4 => {
+                instruction_size = 2;
+                Instruction { // LDY zeropage
+                    operation: Operations::LoadY,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 3
+                }
+            },
+            0xb4 => {
+                instruction_size = 2;
+                Instruction { // LDY zeropage,X
+                    operation: Operations::LoadY,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1).unwrap(), self.x),
+                    cycle_count: 4
+                }
+            },
+            0xac => {
+                instruction_size = 3;
+                Instruction { // LDY absolute
+                    operation: Operations::LoadY,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)),
+                    cycle_count: 4
+                }
+            },
+            0xbc => {
+                instruction_size = 3;
+                Instruction { // LDY absolute,X
+                    operation: Operations::LoadY,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1), self.x),
+                    cycle_count: 4
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

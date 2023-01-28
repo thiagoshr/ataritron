@@ -813,3 +813,46 @@ fn can_fetch_dey_txa_bcc_tya_txs_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_ldy_instructions() {
+    let rom = vec![
+        0xa0, 0x10,
+        0xa4, 0x03,
+        0xb4, 0x04,
+        0xac, 0x02, 0x30,
+        0xbc, 0x03, 0x30
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x01;
+
+    assert_eq!(Instruction {
+        operation: Operations::LoadY,
+        addressing: Addressing::Immediate(0x10),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LoadY,
+        addressing: Addressing::Zeropage(0x03),
+        cycle_count: 3
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LoadY,
+        addressing: Addressing::IndexedZeropage(0x04, 0x01),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LoadY,
+        addressing: Addressing::Absolute(0x3002),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::LoadY,
+        addressing: Addressing::IndexedAbsolute(0x3003, 0x01),
+        cycle_count: 4
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
