@@ -41,6 +41,7 @@ pub enum Operations {
     TransferAccumulatorToX,
     TransferAccumulatorToY,
     TransferStackPointerToX,
+    TransferXToStackPointer,
     TransferXToAccumulator,
     TransferYToAccumulator,
     PushAccumulator,

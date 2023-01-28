@@ -724,6 +724,46 @@ impl Cpu {
                     cycle_count: 4
                 }
             },
+            0x88 => {
+                instruction_size = 1;
+                Instruction { // DEY
+                    operation: Operations::DecrementY,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x8a => {
+                instruction_size = 1;
+                Instruction { // TXA
+                    operation: Operations::TransferXToAccumulator,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x90 => {
+                instruction_size = 2;
+                Instruction { // BCC relative
+                    operation: Operations::BranchOnCarryClear,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1).unwrap()),
+                    cycle_count: 2
+                }
+            },
+            0x98 => {
+                instruction_size = 1;
+                Instruction { // TYA
+                    operation: Operations::TransferYToAccumulator,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0x9a => {
+                instruction_size = 1;
+                Instruction { // TXS
+                    operation: Operations::TransferXToStackPointer,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {

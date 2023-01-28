@@ -770,3 +770,46 @@ fn can_fetch_stx_sty_instructions() {
     }, cpu.fetch());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_dey_txa_bcc_tya_txs_instructions() {
+    let rom = vec![
+        0x88,
+        0x8a,
+        0x90, 0xf6,
+        0x98,
+        0x9a
+    ];
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x0a;
+
+    assert_eq!(Instruction {
+        operation: Operations::DecrementY,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::TransferXToAccumulator,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnCarryClear,
+        addressing: Addressing::RelativeAddress(0xf6),
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::TransferYToAccumulator,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(Instruction {
+        operation: Operations::TransferXToStackPointer,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}
