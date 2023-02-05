@@ -1084,6 +1084,70 @@ impl Cpu {
                     cycle_count: 4
                 }
             },
+            0xe9 => {
+                instruction_size = 2;
+                Instruction { // SBC immediate
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xe5 => {
+                instruction_size = 2;
+                Instruction { // SBC zeropage
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xf5 => {
+                instruction_size = 2;
+                Instruction { // SBC zeropage,X
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xed => {
+                instruction_size = 3;
+                Instruction { // SBC absolute
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
+            0xfd => {
+                instruction_size = 3;
+                Instruction { // SBC absolute,X
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.x),
+                    cycle_count: 4
+                }
+            },
+            0xf9 => {
+                instruction_size = 3;
+                Instruction { // SBC absolute,Y
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.y),
+                    cycle_count: 4
+                }
+            },
+            0xe1 => {
+                instruction_size = 2;
+                Instruction { // SBC (indirect,X)
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::PreindexedIndirect(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 6
+                }
+            },
+            0xf1 => {
+                instruction_size = 2;
+                Instruction { // SBC (indirect),Y
+                    operation: Operations::SubtractWithCarry,
+                    addressing: Addressing::PostindexedIndirect(self.memory.load(self.pc + 1)?, self.y),
+                    cycle_count: 5
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
