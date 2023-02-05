@@ -1091,3 +1091,57 @@ fn can_fetch_dec_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_iny_dex_bne_cld_cpx_instructions() {
+    let rom = vec![
+        0xc8,
+        0xca,
+        0xd0, 0xf6,
+        0xd8,
+        0xe0, 0x0a,
+        0xe4, 0x0b,
+        0xec, 0x0c, 0x03
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::IncrementY,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::DecrementX,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnNotEqual,
+        addressing: Addressing::RelativeAddress(0xf6),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::ClearDecimal,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithX,
+        addressing: Addressing::Immediate(0x0a),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithX,
+        addressing: Addressing::Zeropage(0x0b),
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::CompareWithX,
+        addressing: Addressing::Absolute(0x030c),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

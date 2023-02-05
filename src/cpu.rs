@@ -1028,6 +1028,62 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
+            0xc8 => {
+                instruction_size = 1;
+                Instruction { // INY
+                    operation: Operations::IncrementY,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xca => {
+                instruction_size = 1;
+                Instruction { // DEX
+                    operation: Operations::DecrementX,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xd0 => {
+                instruction_size = 2;
+                Instruction { // BNE
+                    operation: Operations::BranchOnNotEqual,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xd8 => {
+                instruction_size = 1;
+                Instruction { // CLD
+                    operation: Operations::ClearDecimal,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xe0 => {
+                instruction_size = 2;
+                Instruction { // CPX immediate
+                    operation: Operations::CompareWithX,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xe4 => {
+                instruction_size = 2;
+                Instruction { // CPX zeropage
+                    operation: Operations::CompareWithX,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xec => {
+                instruction_size = 3;
+                Instruction { // CPX absolute
+                    operation: Operations::CompareWithX,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
