@@ -1246,3 +1246,33 @@ fn can_fetch_inc_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_inx_beq_sed_instructions() {
+    let rom = vec![
+        0xe8,
+        0xf0, 0x0a,
+        0xf8
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::IncrementX,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::BranchOnEqual,
+        addressing: Addressing::RelativeAddress(0x0a),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::SetDecimal,
+        addressing: Addressing::Implied,
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

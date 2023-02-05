@@ -1180,7 +1180,31 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
-            _ => {
+            0xe8 => {
+                instruction_size = 1;
+                Instruction { // INX
+                    operation: Operations::IncrementX,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xf0 => {
+                instruction_size = 2;
+                Instruction { // BEQ relative
+                    operation: Operations::BranchOnEqual,
+                    addressing: Addressing::RelativeAddress(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xf8 => {
+                instruction_size = 1;
+                Instruction { // SED
+                    operation: Operations::SetDecimal,
+                    addressing: Addressing::Implied,
+                    cycle_count: 2
+                }
+            },
+            0xea | _ => {
                 instruction_size = 1;
                 Instruction {
                     operation: Operations::NoOperation,
