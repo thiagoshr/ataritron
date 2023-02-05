@@ -1208,3 +1208,41 @@ fn can_fetch_sbc_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_inc_instructions() {
+    let rom = vec![
+        0xe6, 0x01,
+        0xf6, 0x02,
+        0xee, 0x03, 0xfe,
+        0xfe, 0x04, 0xfe
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.x = 0x05;
+
+    assert_eq!(Instruction {
+        operation: Operations::IncrementMemory,
+        addressing: Addressing::Zeropage(0x01),
+        cycle_count: 5
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::IncrementMemory,
+        addressing: Addressing::IndexedZeropage(0x02, 0x05),
+        cycle_count: 6
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::IncrementMemory,
+        addressing: Addressing::Absolute(0xfe03),
+        cycle_count: 6
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::IncrementMemory,
+        addressing: Addressing::IndexedAbsolute(0xfe04, 0x05),
+        cycle_count: 7
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

@@ -1148,6 +1148,38 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0xe6 => {
+                instruction_size = 2;
+                Instruction { // INC zeropage
+                    operation: Operations::IncrementMemory,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 5
+                }
+            },
+            0xf6 => {
+                instruction_size = 2;
+                Instruction { // INC zeropage,X
+                    operation: Operations::IncrementMemory,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 6
+                }
+            },
+            0xee => {
+                instruction_size = 3;
+                Instruction { // INC absolute
+                    operation: Operations::IncrementMemory,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 6
+                }
+            },
+            0xfe => {
+                instruction_size = 3;
+                Instruction { // INC absolute,X
+                    operation: Operations::IncrementMemory,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.x),
+                    cycle_count: 7
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
