@@ -1,4 +1,5 @@
 use core::fmt;
+use std::error::Error;
 
 #[derive(Debug)]
 pub struct OutOfRangeError {
@@ -12,6 +13,8 @@ impl fmt::Display for OutOfRangeError {
         write!(f, "Value {} is outside of allowed range [{}, {}]", self.value, self.min, self.max)
     }
 }
+
+impl Error for OutOfRangeError {}
 
 pub struct Memory {
     data : Vec<u8>,

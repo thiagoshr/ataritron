@@ -1350,3 +1350,5 @@ fn can_fetch_pha_pla_plp_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+// TODO: test get_effective_address, get_operand

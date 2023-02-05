@@ -1,11 +1,15 @@
 mod instructions;
 mod flags;
+mod errors;
 
 #[cfg(test)]
 mod tests;
 
+use std::error::Error;
+
 use crate::memory::{Memory, OutOfRangeError};
 use instructions::*;
+use self::errors::CpuError;
 
 pub struct Cpu {
     /// program counter
@@ -60,6 +64,51 @@ impl Cpu {
         let high_bytes = self.memory.load(addr + 1)?;
 
         Ok(((high_bytes as u16) << 8) | (low_bytes as u16))
+    }
+
+    fn get_effective_address(&self, addressing : Addressing) -> Result<u16, CpuError> {
+        match addressing {
+            Addressing::Absolute(addr) => Ok(addr),
+            Addressing::Zeropage(low_nibble) => Ok(0x0000 | low_nibble as u16),
+            Addressing::IndexedAbsolute(base, offset) => Ok(base + offset as u16),
+            Addressing::IndexedZeropage(low_nibble, offset) => Ok((0x0000 | low_nibble as u16) + offset as u16),
+            Addressing::PreindexedIndirect(low_nibble_base, offset) => Ok((0x0000 | low_nibble_base as u16) + offset as u16),
+            Addressing::PostindexedIndirect(low_nibble_base, offset) => {
+                let base_addr = self.load_little_endian_u16(0x0000 | low_nibble_base as u16).unwrap(); // should never panic
+                Ok(base_addr + offset as u16)
+            },
+            Addressing::Indirect(addr) => self.load_little_endian_u16(addr).map_err(|e| CpuError::MemoryBoundsError(e)),
+            Addressing::RelativeAddress(offset) => {
+                if (offset & 0x80) != 0 {
+                    Ok(self.pc - (!offset as u16 + 1))
+                } else {
+                    Ok(self.pc + offset as u16)
+                }
+            },
+            Addressing::Immediate(_) | Addressing::Implied => Err(CpuError::InvalidAddressModeDerefenced)
+            }
+    }
+
+    fn get_operand(&self, addressing : Addressing) -> Result<u8, CpuError> {
+        match addressing {
+            Addressing::Immediate(value) => Ok(value),
+            Addressing::Absolute(_)
+                | Addressing::Zeropage(_)
+                | Addressing::IndexedAbsolute(_,_)
+                | Addressing::IndexedZeropage(_,_)
+                | Addressing::PreindexedIndirect(_,_)
+                | Addressing::PostindexedIndirect(_,_)
+                | Addressing::RelativeAddress(_)
+            => {
+                let effective_addr = self.get_effective_address(addressing)?;
+                
+                self.memory.load(effective_addr).map_err(|e| CpuError::MemoryBoundsError(e))
+            },
+            Addressing::Implied
+                | Addressing::Indirect(_)
+            =>
+                Err(CpuError::InvalidAddressModeDerefenced)
+        }
     }
 
     /// fetches the next instruction to be run and increments the program counter
