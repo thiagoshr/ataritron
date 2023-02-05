@@ -996,6 +996,38 @@ impl Cpu {
                     cycle_count: 5
                 }
             },
+            0xc6 => {
+                instruction_size = 2;
+                Instruction { // DEC zeropage
+                    operation: Operations::DecrementMemory,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 5
+                }
+            },
+            0xd6 => {
+                instruction_size = 2;
+                Instruction { // DEC zeropage,X
+                    operation: Operations::DecrementMemory,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.x),
+                    cycle_count: 6
+                }
+            },
+            0xce => {
+                instruction_size = 3;
+                Instruction { // DEC absolute
+                    operation: Operations::DecrementMemory,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 6
+                }
+            },
+            0xde => {
+                instruction_size = 3;
+                Instruction { // DEC absolute,X
+                    operation: Operations::DecrementMemory,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.x),
+                    cycle_count: 7
+                }
+            },
             _ => {
                 instruction_size = 1;
                 Instruction {
