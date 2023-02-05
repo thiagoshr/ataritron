@@ -1320,3 +1320,33 @@ fn can_fetch_ldx_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_pha_pla_plp_instructions() {
+    let rom = vec![
+        0x48,
+        0x68,
+        0x28
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    assert_eq!(Instruction {
+        operation: Operations::PushAccumulator,
+        addressing: Addressing::Implied,
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::PullAccumulator,
+        addressing: Addressing::Implied,
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::PullStatusRegister,
+        addressing: Addressing::Implied,
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

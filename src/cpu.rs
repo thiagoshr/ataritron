@@ -76,6 +76,30 @@ impl Cpu {
                     cycle_count: 7
                 }
             },
+            0x48 => {
+                instruction_size = 1;
+                Instruction { // PHA
+                    operation: Operations::PushAccumulator,
+                    addressing: Addressing::Implied,
+                    cycle_count: 3
+                }
+            },
+            0x68 => {
+                instruction_size = 1;
+                Instruction { // PLA
+                    operation: Operations::PullAccumulator,
+                    addressing: Addressing::Implied,
+                    cycle_count: 4
+                }
+            },
+            0x28 => {
+                instruction_size = 1;
+                Instruction { // PLP
+                    operation: Operations::PullStatusRegister,
+                    addressing: Addressing::Implied,
+                    cycle_count: 4
+                }
+            },
             0x09 => {
                 instruction_size = 2;
                 Instruction {  // ORA immediate
