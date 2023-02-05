@@ -1276,3 +1276,47 @@ fn can_fetch_inx_beq_sed_instructions() {
     }, cpu.fetch().unwrap());
     assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
 }
+
+#[test]
+fn can_fetch_ldx_instructions() {
+    let rom = vec![
+        0xa2, 0x06,
+        0xa6, 0x07,
+        0xb6, 0x08,
+        0xae, 0x09, 0x16,
+        0xbe, 0x0a, 0x16
+    ];
+
+    let mut mem = Memory::new(64*1024).unwrap();
+    mem.load_rom(0x1000, &rom);
+    let mut cpu = Cpu::new(mem);
+
+    cpu.y = 0x0b;
+
+    assert_eq!(Instruction {
+        operation: Operations::LoadX,
+        addressing: Addressing::Immediate(0x06),
+        cycle_count: 2
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadX,
+        addressing: Addressing::Zeropage(0x07),
+        cycle_count: 3
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadX,
+        addressing: Addressing::IndexedZeropage(0x08, 0x0b),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadX,
+        addressing: Addressing::Absolute(0x1609),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(Instruction {
+        operation: Operations::LoadX,
+        addressing: Addressing::IndexedAbsolute(0x160a, 0x0b),
+        cycle_count: 4
+    }, cpu.fetch().unwrap());
+    assert_eq!(cpu.pc, 0x1000 + rom.len() as u16);
+}

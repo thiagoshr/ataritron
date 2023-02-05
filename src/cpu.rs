@@ -804,6 +804,46 @@ impl Cpu {
                     cycle_count: 4
                 }
             },
+            0xa2 => {
+                instruction_size = 2;
+                Instruction { // LDX immediate
+                    operation: Operations::LoadX,
+                    addressing: Addressing::Immediate(self.memory.load(self.pc + 1)?),
+                    cycle_count: 2
+                }
+            },
+            0xa6 => {
+                instruction_size = 2;
+                Instruction { // LDX zeropage
+                    operation: Operations::LoadX,
+                    addressing: Addressing::Zeropage(self.memory.load(self.pc + 1)?),
+                    cycle_count: 3
+                }
+            },
+            0xb6 => {
+                instruction_size = 2;
+                Instruction { // LDX zeropage,Y
+                    operation: Operations::LoadX,
+                    addressing: Addressing::IndexedZeropage(self.memory.load(self.pc + 1)?, self.y),
+                    cycle_count: 4
+                }
+            },
+            0xae => {
+                instruction_size = 3;
+                Instruction { // LDX absolute
+                    operation: Operations::LoadX,
+                    addressing: Addressing::Absolute(self.load_little_endian_u16(self.pc + 1)?),
+                    cycle_count: 4
+                }
+            },
+            0xbe => {
+                instruction_size = 3;
+                Instruction { // LDX absolute,Y
+                    operation: Operations::LoadX,
+                    addressing: Addressing::IndexedAbsolute(self.load_little_endian_u16(self.pc + 1)?, self.y),
+                    cycle_count: 4
+                }
+            },
             0xa9 => {
                 instruction_size = 2;
                 Instruction { // LDA immediate
